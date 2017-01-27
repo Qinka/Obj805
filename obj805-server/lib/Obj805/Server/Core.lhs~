@@ -1,0 +1,44 @@
+
+\begin{code}
+module Obj805.Server.Core
+       ( Core（..）
+       , Handler(..)
+       , Route(..)
+       , resourcesCore
+       ) where
+\end{code}
+
+
+import
+\begin{code}
+import Import
+import Import.Yesod
+\end{code}
+
+
+basic data
+\begin{code}
+data Core = Core
+            { sendSignal :: TSem
+            , regSignal  :: TVar Int
+            } deriving (Show,Eq)
+\end{code}
+
+route
+\begin{code}
+mkYesodData "Core" [parseRoutes|
+                               /get   GetR  POST
+                               /set   SetR  POST
+                               |]
+\end{code}
+
+instance Yesod
+\begin{code}
+instance Yesod Core where
+  errorHandler e = selectRep $ provideJson $
+    object [ "status"  .= "error"
+           , "context" .= show e
+           ]
+\end{code}
+
+
