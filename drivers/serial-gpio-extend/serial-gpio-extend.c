@@ -51,6 +51,13 @@ static int sgeo_open(struct inode *inode, struct file* filp) {
     sgeo_entry->dev_no = inode->i_rdev;
     sgeo_entry->gpio_buffer = kmalloc(BUFFER_SZIE(sgeo_entry->gpio_bits),GFP_KERNEL);
     init_rwsem(sgeo_entry->sem);
+    sgeo_entry->gpio = gpiochip_find((GPIO_CHIP_STR),is_right_chip);
+    sgeo_entry->gpio->gpio_direction_output(sgeo_entry->gpio,DATA_PIN(sgeo_entry->data_pin),1);
+    sgeo_entry->gpio->gpio_direction_output(sgeo_entry->gpio,SYNC_PIN(sgeo_entry->data_pin),1);
+    sgeo_entry->gpio->gpio_direction_output(sgeo_entry->gpio,CLK_PIN(sgeo_entry->data_pin),1);
+    sgeo_entry->gpio->set(sgeo_entry->gpio,DATA_PIN(sgeo_entry->data_pin),0);
+    sgeo_entry->gpio->set(sgeo_entry->gpio,SYNC_PIN(sgeo_entry->data_pin),0);
+    sgeo_entry->gpio->set(sgeo_entry->gpio,CLK_PIN(sgeo_entry->data_pin),0);
     sgeo_entry->cdev = inode->i_cdev;
     file->private_data = sgeo_entry;
   }
@@ -65,8 +72,10 @@ static int sgeo_close(struct inode *inode, struct file *filp){
   -- count;
   printk(KERN_INFO "SEGO: Close, %d\n",count);
   if(count == 0) {
-    if(sego_entry != NULL)
+    if(sego_entry != NULL) {
       kfree(sego_entry->gpio_buffer);
+      gpio_free(sego_entry->gpio);
+    }
     else
       printk(KERN_WARNING "SEGO: sego_entry is NULL\n");
     kfree(sego_entry);

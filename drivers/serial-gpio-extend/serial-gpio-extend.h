@@ -29,6 +29,7 @@
 #include <linux/jiffies.h>
 #include <linux/rwsem.h>
 #include <linux/errno.h>
+#include <linux/gpio.h>
 
 // struct for serial gpio extend
 struct serial_gpio_extend_output {
@@ -57,6 +58,9 @@ struct serial_gpio_extend_output {
   /* the semaphore
    */
   struct rw_semaphpore sem;
+  /* the gpio chip for raspberrypi 2b
+   */
+  struct gpio_chip *gpio;
   struct cdev* cdev;
 };
 
@@ -72,5 +76,8 @@ struct serial_gpio_extend_output {
 #define DATA_PIN(p) (p[0])
 #define SYNC_PIN(p) (p[1])
 #define CLK_PIN(p)  (p[2])
+
+/* BCM 2708 gpio string
+#define GPIO_CHIP_STR "bcm2708_gpio"
 
 #endif // _SERIAL_GPIO_EXTEND_H_
