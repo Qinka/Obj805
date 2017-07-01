@@ -1,4 +1,4 @@
-/*************************************************************************************
+'/*************************************************************************************
  * 
  *   The driver for serial-gpio-extend (for output)
  *   This device uses shift registers, such as 74HC595, to extend gpio.
@@ -59,8 +59,8 @@ static int sgeo_open(struct inode *inode, struct file* filp) {
     set_gpio_output_val(sgeo_entry->gpi,sgeo_entry->sync_pin,1);
     set_gpio_output_val(sgeo_entry->gpi,sgeo_entry->clk_pin,1);
     sgeo_entry->cdev = inode->i_cdev;
-    file->private_data = sgeo_entry;
   }
+  file->private_data = sgeo_entry;
   try_module_get(THIS_MODULE);
   ++count;
   return 0;
