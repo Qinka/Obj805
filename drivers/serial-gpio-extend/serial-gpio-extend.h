@@ -19,17 +19,37 @@
 #define _SERIAL_GPIO_EXTEND_H_
 
 // headers
+#include <linux/cdev.h>
+#include <linux/semaphore.h>
+#ifdef _SERIAL_GPIO_EXTEND_C_
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/slab.h>
-#include <linux/cdev.h>
-#include <linux/device.h>
-#include <linux/time.h>
-#include <linux/jiffies.h>
-#include <linux/rwsem.h>
 #include <linux/errno.h>
-#include <linux/gpio.h>
+#include <linux/types.h>
+#include <mach/platform.h>
+#include <asm/io.h>
+#include <linux/delay.h>
+#include <linux/proc_fs.h>
+#include <linux/interrupt.h>
+#include "gpio.h"
+#endif // _SERIAL_GPIO_EXTEND_C_
+
+
+// default & configure
+/* default bits
+ */
+#define BITS_SIZE (8)
+/* how many byte need to hold all bits
+ */
+#define BUFFER_SIZE(b) ((b+7) / 8)
+/* get the pins
+ */
+#define DATA_PIN(p) (p[0])
+#define SYNC_PIN(p) (p[1])
+#define CLK_PIN(p)  (p[2])
+
 
 // struct for serial gpio extend
 struct serial_gpio_extend_output {
@@ -49,35 +69,34 @@ struct serial_gpio_extend_output {
   /* how many bit the hardware has
    */
   int   gpio_bits;
-  /* dev_t
-   */
-  dev_t dev_no;
   /* buffer for char(8bits)
    */
   char* gpio_buffer;
   /* the semaphore
    */
-  struct rw_semaphpore sem;
+  struct semaphore sem;
   /* the gpio chip for raspberrypi 2b
    */
-  struct gpio_chip *gpio;
-  struct cdev* cdev;
+  struct bcm2835_gpio_o *gpio;
 };
 
-// default & configure
-/* default bits
- */
-#define BITS_SIZE (8)
-/* how many byte need to hold all bits
- */
-#define BUFFER_SIZE(b) ((b==0?0:b-1) >> 8) + 1)
-/* get the pins
- */
-#define DATA_PIN(p) (p[0])
-#define SYNC_PIN(p) (p[1])
-#define CLK_PIN(p)  (p[2])
+#ifdef _SERIAL_GPIO_EXTEND_C_
+static struct serial_gpio_extend_output* sgeo_entry_alloc(void);
+static void sgeo_entry_free(struct serial_gpio_extend_output **);
+#endif // _SERIAL_GPIO_EXTEND_C_
 
-/* BCM 2708 gpio string
-#define GPIO_CHIP_STR "bcm2708_gpio"
+
+#ifdef _SERIAL_GPIO_EXTEND_C_
+static void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
+EXPORT_SYMBOL_GPL(sgeo_set_value);
+static struct serial_gpio_extend_output* sgeo_default_entry_open(void);
+EXPORT_SYMBOL_GPL(sgeo_default_entry_open);
+static void sgeo_default_entry_close(void);
+EXPORT_SYMBOL_GPL(sgeo_default_entry_close);
+#else
+extern int sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
+extern struct serial_gpio_extend_output * sgeo_default_entry_open(void);
+extern void sgeo_default_entry_close(void);
+#endif // _SERIAL_GPIO_EXTEND_C_
 
 #endif // _SERIAL_GPIO_EXTEND_H_

@@ -17,10 +17,10 @@
 
 
 #include <mach/platform.h>
+#include <linux/kernel.h>
 
 #ifndef _GPIO_H_
 #define _GPIO_H_
-
 
 
 // struct for gpio
@@ -33,7 +33,7 @@ struct bcm2835_gpio_o {
   u32 GPCLR[2];
 };
 
-static void set_gpio_function(int pin, int function);
-static void set_gpio_output_val(int pin, int val);
+static void set_gpio_function(struct bcm2835_gpio_o* gpio, int pin, int function);
+static void set_gpio_output_val(struct bcm2835_gpio_o* gpio, int pin, int val);
 
 #endif // _GPIO_H_

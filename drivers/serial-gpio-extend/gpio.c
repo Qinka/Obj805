@@ -15,9 +15,13 @@
  **************************************************************************************
  */
 
+#define _GPIO_C_
+
 #include "gpio.h"
 
-static void set_gpio_function(struct bcm_2835_gpio_o*gpio, int pin, int function) {
+
+
+static void set_gpio_function(struct bcm2835_gpio_o*gpio, int pin, int function) {
   int reg_index = pin / 10;
   int bit = (pin % 10) *3;
   unsigned old = gpio->GPFSEL[reg_index];
@@ -26,7 +30,7 @@ static void set_gpio_function(struct bcm_2835_gpio_o*gpio, int pin, int function
   gpio->GPFSEL[reg_index] = (old & ~mask) | ((function << bit) & mask);
 }
 
-static void set_gpio_output_val(struct bcm_2835_gpio_o*gpio, int pin, int val) {
+static void set_gpio_output_val(struct bcm2835_gpio_o*gpio, int pin, int val) {
   if (val != 0)
     gpio->GPSET[pin / 32] |= 1 << (pin % 32);
   else
