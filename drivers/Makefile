@@ -1,5 +1,6 @@
-obj-m := sge.o
-sge-objs := serial-gpio-extend.o gpio.o
+obj-m := sge-m.o gpio-m.o
+sge-m-objs := serial-gpio-extend.o
+gpio-m-objs := gpio.o
 
 
 KERNELBUILD := ~/rpi2/linux-rpi-4.4.y

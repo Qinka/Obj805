@@ -1,8 +1,7 @@
 /*************************************************************************************
  * 
- *   The driver for serial-gpio-extend (for output)
- *   This device uses shift registers, such as 74HC595, to extend gpio.
- *   For a normal device, we can use 3 pins to ``extend'' to 16 pins.
+ *   The lower level for access the GPIO of Raspberry Pi (using BCM2835),
+ *   This is tested with RaspberryPi model 2B .
  *
  *   Copyright (C) Qinka 2017
  *   Licence: GPLv3+
@@ -10,18 +9,16 @@
  *   Stability: experimental
  *   Portability: just for raspberrypi(2B) (using BCM 2835)
  *
- *   GPIO source file
+ *   GPIO lower level source file
  *   
  **************************************************************************************
  */
 
 #define _GPIO_C_
-
 #include "gpio.h"
 
 
-
-void set_gpio_function(struct bcm2835_gpio_o*gpio, int pin, int function) {
+void set_gpio_function(struct bcm2835_gpio*gpio, int pin, int function) {
   int reg_index = pin / 10;
   int bit = (pin % 10) *3;
   unsigned old = gpio->GPFSEL[reg_index];
@@ -30,9 +27,37 @@ void set_gpio_function(struct bcm2835_gpio_o*gpio, int pin, int function) {
   gpio->GPFSEL[reg_index] = (old & ~mask) | ((function << bit) & mask);
 }
 
-void set_gpio_output_val(struct bcm2835_gpio_o*gpio, int pin, int val) {
+void set_gpio_val(struct bcm2835_gpio*gpio, int pin, int val) {
+  int pind = pin % 64;
+  do_div(pind,32);
   if (val != 0)
-    gpio->GPSET[pin / 32] |= 1 << (pin % 32);
+    gpio->GPSET[pind] |= 1 << (pin % 32);
   else
-    gpio->GPSET[pin / 32] &= ~(1 << (pin % 32));
+    gpio->GPCLR[pind] &= 1 << (pin % 32);
 }
+
+struct bcm2835_gpio* get_gpio_register(){
+  return (struct bcm2835_gpio*)__io_address(GPIO_BASE);
+}
+
+int get_gpio_val(struct bcm2835_gpio* gpio, int pin){
+  int pind = pin % 64;
+  do_div(pind,32);
+  return gpio->GPLEV[pind] & (1 << (pin % 32));
+}
+
+
+static int gpio_init(void) {
+  printk(KERN_INFO "GPIO: module load\n");
+  return 0;
+}
+
+static void gpio_exit(void) {
+  printk(KERN_INFO "GPIO: module exit\n");
+}
+
+module_init(gpio_init);
+module_exit(gpio_exit);
+
+MODULE_AUTHOR("Qinka <me@qinka.pro>");
+MODULE_LICENSE("GPL");

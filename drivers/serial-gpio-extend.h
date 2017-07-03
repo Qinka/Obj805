@@ -18,25 +18,26 @@
 #ifndef _SERIAL_GPIO_EXTEND_H_
 #define _SERIAL_GPIO_EXTEND_H_
 
-// headers
-#include <linux/cdev.h>
+#include "reinclude.h"
+#include "gpio.h"
 #include <linux/semaphore.h>
-#include <asm/div64.h>
 #ifdef _SERIAL_GPIO_EXTEND_C_
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/kernel.h>
-#include <linux/slab.h>
-#include <linux/errno.h>
-#include <linux/types.h>
 #include <mach/platform.h>
 #include <asm/io.h>
 #include <linux/delay.h>
 #include <linux/proc_fs.h>
 #include <linux/interrupt.h>
-#include "gpio.h"
 #endif // _SERIAL_GPIO_EXTEND_C_
 
+
+			
+#ifdef _SERIAL_GPIO_EXTEND_C_			
+#define SGE_EXTERN__				
+#define SGE_EXPORT__(y) EXPORT_SYMBOL_GPL(y)	
+#else					
+#define SGE_EXTERN__ extern			
+#define SGE_EXPORT__(y)				
+#endif
 
 // default & configure
 /* default bits
@@ -82,7 +83,7 @@ struct serial_gpio_extend_output {
   struct semaphore sem;
   /* the gpio chip for raspberrypi 2b
    */
-  struct bcm2835_gpio_o *gpio;
+  struct bcm2835_gpio *gpio;
 };
 
 #ifdef _SERIAL_GPIO_EXTEND_C_
@@ -90,18 +91,11 @@ struct serial_gpio_extend_output* sgeo_entry_alloc(void);
 void sgeo_entry_free(struct serial_gpio_extend_output **);
 #endif // _SERIAL_GPIO_EXTEND_C_
 
-
-#ifdef _SERIAL_GPIO_EXTEND_C_
-void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
-EXPORT_SYMBOL_GPL(sgeo_set_value);
-struct serial_gpio_extend_output* sgeo_default_entry_open(void);
-EXPORT_SYMBOL_GPL(sgeo_default_entry_open);
-void sgeo_default_entry_close(void);
-EXPORT_SYMBOL_GPL(sgeo_default_entry_close);
-#else
-extern int sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
-extern struct serial_gpio_extend_output * sgeo_default_entry_open(void);
-extern void sgeo_default_entry_close(void);
-#endif // _SERIAL_GPIO_EXTEND_C_
+SGE_EXTERN__ int sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
+SGE_EXPORT__(sgeo_set_value);
+SGE_EXTERN__ struct serial_gpio_extend_output* sgeo_default_entry_open(void);
+SGE_EXPORT__(sgeo_default_entry_open);
+SGE_EXTERN__ void sgeo_default_entry_close(void);
+SGE_EXPORT__(sgeo_default_entry_close);
 
 #endif // _SERIAL_GPIO_EXTEND_H_

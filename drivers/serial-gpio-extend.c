@@ -22,9 +22,6 @@
 
 // global variables
 static struct serial_gpio_extend_output* sgeo_entry = NULL;
-static struct dev_t sgeo_dev; // device
-static int count;
-static int sgeo_major = 0;
 static int pins[3] = {0,0,0};
 static int gpio_bits = 0;
 // proc
@@ -53,13 +50,13 @@ struct serial_gpio_extend_output* sgeo_entry_alloc() {
     entry->gpio_bits = BITS_SIZE;
   entry->gpio_buffer = kmalloc(BUFFER_SIZE(entry->gpio_bits),GFP_KERNEL | __GFP_ZERO);
   sema_init(&entry->sem,1);
-  entry->gpio = (struct bcm2835_gpio_o*)__io_address(GPIO_BASE);
+  entry->gpio = get_gpio_register();
   set_gpio_function(entry->gpio,entry->data_pin,0b001);
   set_gpio_function(entry->gpio,entry->sync_pin,0b001);
   set_gpio_function(entry->gpio,entry->clk_pin,0b001);
-  set_gpio_output_val(entry->gpio,entry->data_pin,0);
-  set_gpio_output_val(entry->gpio,entry->sync_pin,0);
-  set_gpio_output_val(entry->gpio,entry->clk_pin,0);
+  set_gpio_val(entry->gpio,entry->data_pin,0);
+  set_gpio_val(entry->gpio,entry->sync_pin,0);
+  set_gpio_val(entry->gpio,entry->clk_pin,0);
   return entry;
 }
     
@@ -77,15 +74,21 @@ void sgeo_entry_free(struct serial_gpio_extend_output ** entry){
 }
     
 // set up the value
-void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val) {
-  down_interruptible(&entry->sem);
-  int pind = do_div(pin,8);
-  if(val == 0)
-    entry->gpio_buffer[pind] &= ~(1 << (pin % 8));
-  else
-    entry->gpio_buffer[pind ] |=  (1 << (pin % 8));
-  up(&entry->sem);
-  tasklet_schedule(&sgeo_sync_tl);
+int sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val) {
+  if(entry != NULL) {
+    if (down_interruptible(&entry->sem))
+      return -ERESTARTSYS;
+    int pind = pin;
+    do_div(pind,8);
+    if(val == 0)
+      entry->gpio_buffer[pind] &= ~(1 << (pin % 8));
+    else
+      entry->gpio_buffer[pind ] |=  (1 << (pin % 8));
+    up(&entry->sem);
+    tasklet_schedule(&sgeo_sync_tl);
+    return 0;
+  }
+  else return -ENOMEM;
 }
 
 // return the default of this module
@@ -102,23 +105,25 @@ void sgeo_default_entry_close(){
 // the worker for tasklet to send info.
 void sgeo_sync_worker(unsigned long ptr) {
   struct serial_gpio_extend_output* entry = (struct serial_gpio_extend_output*) ptr;
-  for(int i = 0; i < BUFFER_SIZE(entry->gpio_bits); ++i) {
-    char * c = entry->gpio_buffer[i];
-    char mask = 0b1;
-    while(mask) {
-      if(*c & mask)
-	set_gpio_output_val(entry->gpio,entry->data_pin,1);
-      else	
-	set_gpio_output_val(entry->gpio,entry->data_pin,0);      
-      set_gpio_output_val(entry->gpio,entry->clk_pin,1);
-      ndelay(100);    
-      set_gpio_output_val(entry->gpio,entry->clk_pin,0);
-      mask <<= 1;
+  if(entry != NULL && entry->gpio_buffer != NULL) {
+    for(int i = 0; i < BUFFER_SIZE(entry->gpio_bits); ++i) {
+      char * c = entry->gpio_buffer[i];
+      char mask = 0b1;
+      while(mask) {
+	if(*c & mask)
+	  set_gpio_val(entry->gpio,entry->data_pin,1);
+	else	
+	  set_gpio_val(entry->gpio,entry->data_pin,0);      
+	set_gpio_val(entry->gpio,entry->clk_pin,1);
+	ndelay(100);    
+	set_gpio_val(entry->gpio,entry->clk_pin,0);
+	mask <<= 1;
+      }
     }
+    set_gpio_val(entry->gpio,entry->sync_pin,1);
+    ndelay(100);
+    set_gpio_val(entry->gpio,entry->sync_pin,0);
   }
-  set_gpio_output_val(entry->gpio,entry->sync_pin,1);
-  ndelay(100);
-  set_gpio_output_val(entry->gpio,entry->sync_pin,0);      
 }
 
 
