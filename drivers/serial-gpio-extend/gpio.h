@@ -33,7 +33,7 @@ struct bcm2835_gpio_o {
   u32 GPCLR[2];
 };
 
-static void set_gpio_function(struct bcm2835_gpio_o* gpio, int pin, int function);
-static void set_gpio_output_val(struct bcm2835_gpio_o* gpio, int pin, int val);
+void set_gpio_function(struct bcm2835_gpio_o* gpio, int pin, int function);
+void set_gpio_output_val(struct bcm2835_gpio_o* gpio, int pin, int val);
 
 #endif // _GPIO_H_

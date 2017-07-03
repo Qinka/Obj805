@@ -81,17 +81,17 @@ struct serial_gpio_extend_output {
 };
 
 #ifdef _SERIAL_GPIO_EXTEND_C_
-static struct serial_gpio_extend_output* sgeo_entry_alloc(void);
-static void sgeo_entry_free(struct serial_gpio_extend_output **);
+struct serial_gpio_extend_output* sgeo_entry_alloc(void);
+void sgeo_entry_free(struct serial_gpio_extend_output **);
 #endif // _SERIAL_GPIO_EXTEND_C_
 
 
 #ifdef _SERIAL_GPIO_EXTEND_C_
-static void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
+void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);
 EXPORT_SYMBOL_GPL(sgeo_set_value);
-static struct serial_gpio_extend_output* sgeo_default_entry_open(void);
+struct serial_gpio_extend_output* sgeo_default_entry_open(void);
 EXPORT_SYMBOL_GPL(sgeo_default_entry_open);
-static void sgeo_default_entry_close(void);
+void sgeo_default_entry_close(void);
 EXPORT_SYMBOL_GPL(sgeo_default_entry_close);
 #else
 extern int sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val);

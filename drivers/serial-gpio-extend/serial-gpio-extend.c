@@ -36,7 +36,7 @@ void sgeo_sync_worker(unsigned long ptr);
 static struct tasklet_struct sgeo_sync_tl;
 
 // allocate the sgeo entry
-static struct serial_gpio_extend_output* sgeo_entry_alloc() {
+struct serial_gpio_extend_output* sgeo_entry_alloc() {
   struct serial_gpio_extend_output* entry;
   printk(KERN_INFO "SGEO: Entry allocate\n");
   entry = kmalloc(sizeof(struct serial_gpio_extend_output),GFP_KERNEL);
@@ -65,7 +65,7 @@ static struct serial_gpio_extend_output* sgeo_entry_alloc() {
     
     
 // free sego entry
-static void sgeo_entry_free(struct serial_gpio_extend_output ** entry){
+void sgeo_entry_free(struct serial_gpio_extend_output ** entry){
   printk(KERN_INFO "SEGO: free entry\n");
   if(*entry != NULL) {
     kfree((*entry)->gpio_buffer);
@@ -77,7 +77,7 @@ static void sgeo_entry_free(struct serial_gpio_extend_output ** entry){
 }
     
 // set up the value
-static void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val) {
+void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val) {
   down_interruptible(&entry->sem);
   if(val == 0)
     entry->gpio_buffer[pin / 8] &= ~(1 << (pin % 8));
@@ -88,12 +88,12 @@ static void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char
 }
 
 // return the default of this module
-static struct serial_gpio_extend_output * sgeo_default_entry_open(){
+struct serial_gpio_extend_output * sgeo_default_entry_open(){
   try_module_get(THIS_MODULE);
   return sgeo_entry;
 }
 // ``close''
-static void sgeo_default_entry_close(){
+void sgeo_default_entry_close(){
   module_put(THIS_MODULE);
 }
 
@@ -123,17 +123,17 @@ void sgeo_sync_worker(unsigned long ptr) {
 
 // for proc file
 // open
-static int sgeo_proc_open(struct inode* inode,struct file *filp) {
+int sgeo_proc_open(struct inode* inode,struct file *filp) {
   try_module_get(THIS_MODULE);
   return 0;
 }
 // close
-static int sgeo_proc_close(struct inode* inode, struct file *filp) {
+int sgeo_proc_close(struct inode* inode, struct file *filp) {
   module_put(THIS_MODULE);
   return 0;
 }
 // read
-static int sgeo_proc_read(struct file *filp,char *buf,size_t count,loff_t* f_pos){
+int sgeo_proc_read(struct file *filp,char *buf,size_t count,loff_t* f_pos){
   int len = 0;
   int limit = count - 20;
   int k = *f_pos / 14;
