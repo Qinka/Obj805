@@ -18,22 +18,36 @@
 #include "bcm2835-gpio.h"
 
 
-void set_gpio_function(struct bcm2835_gpio*gpio, int pin, int function) {
+int set_gpio_function(struct bcm2835_gpio*gpio, int pin, int function) {
+  if(gpio == NULL) {
+    printk(KERN_WARNING "GPIO: gpio is NULL\n");
+    goto gpio_is_null;
+  }
   int reg_index = pin / 10;
   int bit = (pin % 10) *3;
   unsigned old = gpio->GPFSEL[reg_index];
   unsigned mask = 0b111 << bit;
   printk(KERN_DEBUG "GPIO: changing function of GPIO pin %d from %x to %x\n",pin, (old >> bit) & 0b111,function);
   gpio->GPFSEL[reg_index] = (old & ~mask) | ((function << bit) & mask);
+  return 0;
+ gpio_is_null:
+  return - GPIO_ERR_NULL;
 }
 
-void set_gpio_val(struct bcm2835_gpio*gpio, int pin, int val) {
+int set_gpio_val(struct bcm2835_gpio*gpio, int pin, int val) {
+  if(gpio == NULL) {
+    printk(KERN_WARNING "GPIO: gpio is NULL\n");
+    goto gpio_is_null;
+  }
   int pind = pin % 64;
   do_div(pind,32);
   if (val != 0)
     gpio->GPSET[pind] |= 1 << (pin % 32);
   else
     gpio->GPCLR[pind] &= 1 << (pin % 32);
+  return 0;
+ gpio_is_null:
+  return - GPIO_ERR_NULL;
 }
 
 struct bcm2835_gpio* get_gpio_register(){
@@ -41,9 +55,15 @@ struct bcm2835_gpio* get_gpio_register(){
 }
 
 int get_gpio_val(struct bcm2835_gpio* gpio, int pin){
+  if(gpio == NULL) {
+    printk(KERN_WARNING "GPIO: gpio is NULL\n");
+    goto gpio_is_null;
+  }
   int pind = pin % 64;
   do_div(pind,32);
-  return gpio->GPLEV[pind] & (1 << (pin % 32));
+  return (gpio->GPLEV[pind] & (1 << (pin % 32))) ? 1 : 0;
+ gpio_is_null:
+  return - GPIO_ERR_NULL;
 }
 
 

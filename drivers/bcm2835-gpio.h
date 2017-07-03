@@ -41,13 +41,16 @@ struct bcm2835_gpio {
  u32 GPLEV[2];
 };
 
-GPIO_EXTERN__ void set_gpio_function(struct bcm2835_gpio* gpio, int pin, int function);
+GPIO_EXTERN__ int set_gpio_function(struct bcm2835_gpio* gpio, int pin, int function);
 GPIO_EXPORT__(set_gpio_function);
-GPIO_EXTERN__ void set_gpio_val(struct bcm2835_gpio* gpio, int pin, int val);
+GPIO_EXTERN__ int set_gpio_val(struct bcm2835_gpio* gpio, int pin, int val);
 GPIO_EXPORT__(set_gpio_val);
 GPIO_EXTERN__ struct bcm2835_gpio* get_gpio_register(void);
 GPIO_EXPORT__(get_gpio_register);
 GPIO_EXTERN__ int get_gpio_val(struct bcm2835_gpio* gpio, int pin);
 GPIO_EXPORT__(get_gpio_val);
+
+// ERROR Information
+#define GPIO_ERR_NULL 1
 
 #endif // _GPIO_H_
