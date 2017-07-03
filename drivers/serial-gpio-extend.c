@@ -39,8 +39,8 @@ static struct tasklet_struct sgeo_sync_tl;
 struct serial_gpio_extend_output* sgeo_entry_alloc() {
   struct serial_gpio_extend_output* entry;
   printk(KERN_INFO "SGEO: Entry allocate\n");
-  entry = kmalloc(sizeof(struct serial_gpio_extend_output),GFP_KERNEL);
-  if (sgeo_entry == NULL) {
+  entry = kmalloc(sizeof(struct serial_gpio_extend_output),GFP_KERNEL | __GFP_ZERO);
+  if (entry == NULL) {
     printk(KERN_ERR "SGEO: can not allocate memory\n");
     return NULL;
   }
@@ -51,7 +51,7 @@ struct serial_gpio_extend_output* sgeo_entry_alloc() {
     entry->gpio_bits = gpio_bits;
   else
     entry->gpio_bits = BITS_SIZE;
-  entry->gpio_buffer = kmalloc(BUFFER_SIZE(entry->gpio_bits),GFP_KERNEL);
+  entry->gpio_buffer = kmalloc(BUFFER_SIZE(entry->gpio_bits),GFP_KERNEL | __GFP_ZERO);
   sema_init(&entry->sem,1);
   entry->gpio = (struct bcm2835_gpio_o*)__io_address(GPIO_BASE);
   set_gpio_function(entry->gpio,entry->data_pin,0b001);
@@ -79,10 +79,11 @@ void sgeo_entry_free(struct serial_gpio_extend_output ** entry){
 // set up the value
 void sgeo_set_value(struct serial_gpio_extend_output * entry,int pin,char val) {
   down_interruptible(&entry->sem);
+  int pind = do_div(pin,8);
   if(val == 0)
-    entry->gpio_buffer[pin / 8] &= ~(1 << (pin % 8));
+    entry->gpio_buffer[pind] &= ~(1 << (pin % 8));
   else
-    entry->gpio_buffer[pin /8 ] |=  (1 << (pin % 8));
+    entry->gpio_buffer[pind ] |=  (1 << (pin % 8));
   up(&entry->sem);
   tasklet_schedule(&sgeo_sync_tl);
 }
@@ -123,32 +124,37 @@ void sgeo_sync_worker(unsigned long ptr) {
 
 // for proc file
 // open
-int sgeo_proc_open(struct inode* inode,struct file *filp) {
+static int sgeo_proc_open(struct inode* inode,struct file *filp) {
   try_module_get(THIS_MODULE);
   return 0;
 }
 // close
-int sgeo_proc_close(struct inode* inode, struct file *filp) {
+static int sgeo_proc_close(struct inode* inode, struct file *filp) {
   module_put(THIS_MODULE);
   return 0;
 }
 // read
-int sgeo_proc_read(struct file *filp,char *buf,size_t count,loff_t* f_pos){
-  int len = 0;
-  int limit = count - 20;
-  int k = *f_pos / 14;
-  for(int i = k / 8; i < BUFFER_SIZE(sgeo_entry->gpio_bits) && len <= limit; ++i) {
-    char * c = sgeo_entry->gpio_buffer[i];
+static int sgeo_proc_read(struct file *filp,char *buf,size_t count,loff_t* f_pos){
+  if(sgeo_entry->gpio_buffer == NULL) {
+    printk(KERN_ERR "SEGO: gpio buffer is empty\n");
+    return -1;
+  }
+  if(sgeo_entry->gpio_bits == 0) {
+    printk(KERN_WARNING "SEGO: gpio size is zero\n");
+    return 0;
+  }
+  for(int i = 0,k=0; i < BUFFER_SIZE(sgeo_entry->gpio_bits); ++i) {
+    char * c = &sgeo_entry->gpio_buffer[i];
     char mask = 0b1 << k % 8;
     while(mask) {
       if(*c & mask)
-	len += sprintf(buf+len,"pin %4d:HIGH\n",k);
+        printk(KERN_INFO "pin %4d:HIGH\n",k);
       else	
-	len += sprintf(buf+len,"pin %4d: LOW\n",k);
+        printk(KERN_INFO "pin %4d: LOW\n",k);
+      mask <<= 1;
       k++;
     }
   }
-  *f_pos += len;
   return 0;
 }
 
@@ -171,7 +177,7 @@ static int serial_gpio_extend_init(void) {
 // exit for module
 static void  serial_gpio_extend_exit(void) {
   printk(KERN_INFO "SGE: exit !\n");
-  remove_proc_entry("sge_output_pin",NULL);
+  remove_proc_entry("sge_output_pins",NULL);
   sgeo_entry_free(&sgeo_entry);
 }
 

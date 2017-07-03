@@ -21,6 +21,7 @@
 // headers
 #include <linux/cdev.h>
 #include <linux/semaphore.h>
+#include <asm/div64.h>
 #ifdef _SERIAL_GPIO_EXTEND_C_
 #include <linux/init.h>
 #include <linux/module.h>
@@ -43,7 +44,11 @@
 #define BITS_SIZE (8)
 /* how many byte need to hold all bits
  */
-#define BUFFER_SIZE(b) ((b+7) / 8)
+inline size_t  BUFFER_SIZE(size_t b){
+  b += 7;
+  do_div(b,8);
+  return b;
+}
 /* get the pins
  */
 #define DATA_PIN(p) (p[0])
