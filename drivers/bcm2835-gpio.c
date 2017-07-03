@@ -15,7 +15,7 @@
  */
 
 #define _GPIO_C_
-#include "gpio.h"
+#include "bcm2835-gpio.h"
 
 
 void set_gpio_function(struct bcm2835_gpio*gpio, int pin, int function) {

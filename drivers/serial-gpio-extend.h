@@ -19,7 +19,7 @@
 #define _SERIAL_GPIO_EXTEND_H_
 
 #include "reinclude.h"
-#include "gpio.h"
+#include "bcm2835-gpio.h"
 #include <linux/semaphore.h>
 #ifdef _SERIAL_GPIO_EXTEND_C_
 #include <mach/platform.h>
