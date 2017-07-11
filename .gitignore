@@ -42,3 +42,5 @@ Module.symvers
 modules.order
 *.ko
 *.mod.c
+
+.output
