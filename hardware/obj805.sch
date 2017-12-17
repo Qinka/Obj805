@@ -827,4 +827,9 @@ Wire Wire Line
 	3450 6250 3450 5900
 Wire Wire Line
 	3450 5900 3500 5900
+Wire Wire Line
+	1800 6500 8050 6500
+Wire Wire Line
+	8050 6500 8050 3800
+Connection ~ 8050 3800
 $EndSCHEMATC
