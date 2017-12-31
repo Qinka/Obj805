@@ -1,0 +1,44 @@
+# The config of Travis
+#to use ubuntu 14.04
+
+sudo: required
+dist: trusty
+group: deprecated-2017Q4
+
+matrix:
+  include:
+    - env: GHC_VER=8.2.2 CABAL_VER=2.0 LLVM=true RUN_BUILD=true THREADED=true IS_DOCKER
+      addons:
+        apt:
+          sources:
+            - hvr-ghc
+            - llvm-toolchain-trusty
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - wget
+            - curl
+            - ghc-8.2.2
+            - cabal-install-2.0
+            - lldb-3.9
+            - llvm-3.9
+            - llvm-3.9-dev
+            - llvm-3.9-runtime
+            
+
+# using docker
+services:
+  - docker
+
+# pre-install
+before_install:
+  - source $TRAVIS_BUILD_DIR/integration/ci.sh/init.sh
+
+
+# build
+script:
+  - source $TRAVIS_BUILD_DIR/integration/ci.sh/build.sh
+  # - source $TRAVIS_BUILD_DIR/integration/ci.sh/test.sh
+
+# update docker image
+after_success:
+- source $TRAVIS_BUILD_DIR/integration/ci.sh/succ.sh
