@@ -48,17 +48,16 @@ postSpeedR = do
   case speed of
     Just s' -> do
       Core{..} <- getYesod
-      let s = read $ T.unpack s'
-      liftIO . atomically $ do
-        writeTVar  speedReg  s
-        writeTChan speedChan s
-      selectRep $ provideJson $
-        object [ "status" .= ("success" :: String)
-               ]
-    _ -> selectRep $ provideJson $
-      object [ "status"  .= ("error" :: String)
-             , "context" .= ("can not find arg(speed)" :: String)
-             ]
+      case T.readMay s' of
+        Just s -> do
+          liftIO . atomically $ do
+            writeTVar  speedReg  s
+            writeTChan speedChan s
+          selectRep $ provideJson $
+            object [ "status" .= ("success" :: String)
+                   ] 
+        _ -> invalidArgs ["Can not parse arg(speed)",s']
+    _ -> invalidArgs ["can not find arg(speed)"]
 getSpeedR :: Handler TypedContent
 getSpeedR = do
   Core{..} <- getYesod
@@ -74,7 +73,7 @@ getSpeedR = do
           (liftIO $ readTVarIO speedReg) >>= (sendTextData . T.pack . show)
           forever $ do
             x <- liftIO $ atomically $ readTChan myChan
-            sendTextData $ T.pack $ show x
+            sendTextData $ T.show x
 
 getHomeR :: Handler T.Text
 getHomeR = return "Obj805"

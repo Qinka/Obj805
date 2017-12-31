@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Obj805 Control page</title>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale-1.0,maximum-scale-1.0,user-scalable=no"/>
+        <link href="page.css" rel="stylesheet"/>
+        <link href="kernel.js" ref="javascript"/>
+    </head>
+    <body>
+        <div id="speed">0</div>
+        <div class=button>
+            <button onclick="onClick_update(1)">Upper</button>
+            <button onclick="onClick_update(-1)">Lower</button>
+        </div>
+        <div class=remote>
+            <form>
+                New remote: <br/>
+                <input type="text" value="" name="url"/>
+                <br/>
+                <input type="submit" value="Reconnect"/>
+            </form>
+        </div>
+        <script src="kernel.js">
+        </script>
+    </body>
+</html>

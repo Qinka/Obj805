@@ -30,17 +30,22 @@ module Import.Text
   ( module Data.Text
   , module Data.Text.Encoding
   , read
+  , readMay
   , show
   ) where
 
 import Prelude hiding (read,show)
 import qualified Prelude as P
+import qualified Safe as S
 
 import Data.Text
 import Data.Text.Encoding
 
 read :: Read a => Text -> a
 read = P.read . unpack
+
+readMay :: Read a => Text -> Maybe a
+readMay = S.readMay . unpack
 
 show :: Show a => a -> Text
 show = pack . P.show
