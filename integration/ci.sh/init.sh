@@ -24,7 +24,7 @@ if [ -n "$LLVM" ]; then
   wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
   echo deb http://apt.llvm.org/$OS_CORENAME/ llvm-toolchain-$OS_CORENAME-$LLVM main | sudo tee -a /etc/apt/sources.list.d/llvm.list
   sudo apt update
-  sudo apt install -y libllvm$LLVM libllvm$LLVM-dbg liblldb-$LLVM lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
+  sudo apt install -y lldb-$LLVM llvm-$LLVM llvm-$LLVM-dev llvm-$LLVM-runtime
 else
   echo without llvm
 fi
