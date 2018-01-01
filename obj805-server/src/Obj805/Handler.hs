@@ -43,6 +43,7 @@ import Import.STM
 import Import.Yesod
 import qualified Import.Text as T
 import qualified Import.ByteString as B
+import Control.Concurrent
 
 postSpeedR :: Handler TypedContent
 postSpeedR = do
@@ -73,19 +74,11 @@ getSpeedR = do
           Core{..} <- getYesod
           (liftIO $ readTVarIO speedReg) >>= (sendTextData . T.pack . show)
           myChan <- liftIO $ atomically $ dupTChan speedChan
-          let readSpeed = liftIO $ atomically $ readTChan myChan
-              readMesg  = do
-                msg <- receiveDataMessageE
-                case msg of
-                  Left e -> do
-                    $(logError) (T.show e)
-                    return False
-                  Right _ -> return True
-          forever $ do
-            rt <- race readSpeed readMesg
-            case rt of
-              Left  s -> sendTextData $ T.show s
-              Right _ -> sendPing ("\x89\x00" :: B.ByteString)
+          let readSpeed    = (liftIO $ atomically $ readTChan myChan)
+                >>= sendTextData . T.show
+              sleepForPing = (liftIO $ threadDelay 10000000) >> 
+                ((liftIO $ readTVarIO speedReg) >>= sendPing . T.show) 
+          forever $ race_ readSpeed sleepForPing
 
 getHomeR :: Handler T.Text
 getHomeR = return "Obj805"

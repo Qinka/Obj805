@@ -35,7 +35,7 @@ docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 ######
 echo setting up ghc-$GHC_VER
-export PATH=/opt/ghc/$GHC_VER/bin:$PATH
+export PATH=$HOME/.cabal/bin:/opt/ghc/$GHC_VER/bin:$PATH
 ghc -V
 
 ######

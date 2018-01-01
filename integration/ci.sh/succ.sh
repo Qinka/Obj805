@@ -20,8 +20,7 @@ cd $TRAVIS_BUILD_DIR
 mkdir -p docker.tmp/root
 
 echo install tools
-stack install
-stack install cabal-install alex happy
+cabal install  alex happy
 
 cd yu-launch
 echo Configuration
