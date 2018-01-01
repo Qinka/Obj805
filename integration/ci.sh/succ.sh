@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 set -e
@@ -20,6 +21,7 @@ cd $TRAVIS_BUILD_DIR
 mkdir -p docker.tmp/root
 
 echo install tools
+cabal update
 cabal install  alex happy
 
 cd yu-launch
