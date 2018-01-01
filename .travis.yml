@@ -7,22 +7,15 @@ group: deprecated-2017Q4
 
 matrix:
   include:
-    - env: GHC_VER=8.2.2 CABAL_VER=2.0 LLVM=true RUN_BUILD=true THREADED=true IS_DOCKER
+    - env: GHC_VER=8.2.2 CABAL_VER=2.0 LLVM=3.9 RUN_BUILD=true THREADED=true IS_DOCKER
       addons:
         apt:
           sources:
             - hvr-ghc
             - llvm-toolchain-trusty
-            - llvm-toolchain-trusty-3.9
           packages:
             - wget
             - curl
-            - ghc-8.2.2
-            - cabal-install-2.0
-            - lldb-3.9
-            - llvm-3.9
-            - llvm-3.9-dev
-            - llvm-3.9-runtime
             
 
 # using docker
