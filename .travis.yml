@@ -6,7 +6,7 @@ dist: trusty
 
 matrix:
   include:
-    - env: GHC_VER=8.2.2 CABAL_VER=2.0 LLVM=3.9 RUN_BUILD=true THREADED=true IS_DOCKER
+    - env: GHC_VER=8.2.2 CABAL_VER=2.0 LLVM=3.9 RUN_BUILD=true THREADED=true IS_DOCKER=true
       addons:
         apt:
           sources:
