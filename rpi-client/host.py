@@ -66,6 +66,7 @@ def writeSpeed(q):
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(ENABLE_PIN,GPIO.OUT)
     GPIO.setup(PWM_PIN,GPIO.OUT)
+    GPIO.output(ENABLE_PIN, GPIO.HIGH) 
     print('start the GPIO')
     p = GPIO.PWM(PWM_PIN,PWM_FREQ)
     p.start(0)
