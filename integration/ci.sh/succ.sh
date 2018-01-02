@@ -20,9 +20,9 @@ cd $TRAVIS_BUILD_DIR
 mkdir -p docker.tmp/root
 
 echo install tools
-cabal install  alex happy
+cabal install alex happy
 
-cd yu-launch
+cd obj805-server
 echo Configuration
 cabal configure --prefix='/' \
     --datasubdir='obj805' \
