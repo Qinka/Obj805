@@ -45,8 +45,8 @@ import qualified Import.Text as T
 
 -- | Basic Types
 data Core = Core
-  { speedChan :: TChan Int
-  , speedReg  :: TVar  Int
+  { speedChan :: TChan Double
+  , speedReg  :: TVar  Double
   } deriving (Eq)
 
 mkYesodData "Core" [parseRoutes| /      HomeR  GET

@@ -20,11 +20,13 @@ API_URL = os.environ.get('API_URL','localhost:3000/speed')
 HTTP_PREFIX = os.environ.get('HTTP_PREFEX','http')
 # websocket
 WS_PREFIX = os.environ.get('WS_PREFIX','ws')
+# DEBUG FLAG
+DEBUG = os.environ.get('DEBUG','false')
 
 def readSpeedFromWebSocket(q):
     print('speed web socket start')
     def on_message(ws, message):
-        dc = int(message)
+        dc = float(message)
         q.put(dc)
 
     def on_error(ws, error):
@@ -39,6 +41,7 @@ def readSpeedFromWebSocket(q):
   #  websocket.enableTrace(True)
     url = WS_PREFIX + '://' + API_URL
     print(url)
+    websocket.enableTrace(DEBUG == 'false')
     webSock = websocket.WebSocketApp(url,
                                      on_message = on_message,
                                      on_error = on_error,
