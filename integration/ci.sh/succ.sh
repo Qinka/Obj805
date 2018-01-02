@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 set -e
@@ -20,7 +21,8 @@ cd $TRAVIS_BUILD_DIR
 mkdir -p docker.tmp/root
 
 echo install tools
-cabal install alex happy
+cabal update
+cabal install  alex happy
 
 cd obj805-server
 echo Configuration

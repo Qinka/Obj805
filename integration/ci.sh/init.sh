@@ -35,8 +35,9 @@ docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 ######
 echo setting up ghc-$GHC_VER
-export PATH=$HOME/.cabal/bin:/opt/ghc/$GHC_VER/bin:$PATH
-ghc -V
+export PATH=$HOME/.cabal/bin:/opt/cabal/$CABAL_VER/bin:/opt/ghc/$GHC_VER/bin:$PATH
+ghc --version
+cabal --version
 
 ######
 echo install haskell-stack
