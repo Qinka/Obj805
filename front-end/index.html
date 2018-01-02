@@ -1,24 +1,53 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Obj805 Control page</title>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width,initial-scale-1.0,maximum-scale-1.0,user-scalable=no"/>
-        <link href="page.css" rel="stylesheet"/>
+        <link href="kernel.css" rel="stylesheet"/>
         <link href="kernel.js" ref="javascript"/>
     </head>
     <body>
-        <div id="speed">0</div>
-        <div class=button>
-            <button onclick="onClick_update(1)">Upper</button>
-            <button onclick="onClick_update(-1)">Lower</button>
+        <div class="mainFrame">
+            <div class="ShowSpeed">
+                <h2> Speed of Fan</h2>
+                <span id="speedT">0</span>
+            </div>
+            <div class="ShowRange">
+                <span>
+                    <input type="range" id="dc" min="0" max="100" value="0" step="0.1" oninput="rangeChange()" onchange="rangeChange()"/>
+                </span>
+            </div>
+            <div class=buttons>
+                <button onclick="setting()">Setting</button>
+                <button onclick="fineTuning()">Fine Tuning</button>
+            </div>
         </div>
-        <div class=remote>
-            <form>
-                New remote: <br/>
-                <input type="text" value="" name="url"/>
-                <br/>
-                <input type="submit" value="Reconnect"/>
-            </form>
+        <div class="Setting">
+            <h2>Setting</h2>
+            <div class=remote>
+                <h3>Remote Setting</h3>
+                <form>
+                    New remote: <br/>
+                    <input type="text" value="" name="url"/>
+                    <br/>
+                    <input type="submit" value="Reconnect"/>
+                </form>
+            </div>
+            <div class=buttons>
+                <button onclick="backToMainFrame()">Back</button>
+            </div>
+        </div>
+        <div class="fineTuning">
+            <h2>Fine Tuning</h2>
+            <div class=button>
+                Current value: <span id="oldvalue"> </span> <br/>
+                New value: <input type="number" id="newvalue" min="0" max="100"  step="0.1"/> <br/>
+                <button onclick="updateNewValue()">Update</button>
+            </div>
+            <div class=buttons>
+                <button onclick="backToMainFrame()">Back</button>
+            </div>
         </div>
         <script src="kernel.js">
         </script>

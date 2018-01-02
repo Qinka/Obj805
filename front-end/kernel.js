@@ -1,59 +1,153 @@
-var dc = 0;
-socket;
-console.log('hi');
+//
+// Global values
+//
 
-function GetRequest() {
+// dc value
+var dc = 0;
+var debugFlag = false;
+var apiurl = null;
+
+//
+// functions
+//
+
+// range change or input
+function rangeChange() {
+  var value = document.getElementById('dc').value;
+  logDebug("new value of dc, from range",value);
+  uploadNewValueToSvr(value);
+  getNewValueFromSvr(value);
+  return;
+}
+
+// Into setting frame
+function setting() {
+  return;
+}
+
+// Into fine tuning frame
+function fineTuning() {
+  return ;
+}
+
+// update new value
+function updateNewValue() {
+  return ;
+}
+
+// back to main frame
+function backToMainFrame() {
+  return ;
+}
+
+// debug output
+function logDebug(message, ...optionalParams) {
+  if (debugFlag) return console.log(message,optionalParams);
+}
+
+// function for main
+function entryPoint() {
+  debugFlag = isDebug();
+  logDebug('Hi, Obj805 Debug mod!');
+  // get remote url 
+  var params = fetchGETParams();
+  var apiurlP = params['url'];
+  var apiurlC = getCookie("apiurl");
+  if (apiurlP != null) 
+    apiurl = apiurlP;
+  else if (apiurlC != null)
+    apiurl = apiurlC;
+  else
+    apiurl = "localhost:3000/speed";
+  setCookie("apiurl",apiurl,null);
+  var socket = new WebSocket('ws://'+apiurl);
+  socket.onopen    = function(event){
+    logDebug("socket launched",event);
+  };
+  socket.onmessage = function(event){
+    getNewValueFromSvr(event.data);
+    logDebug('Client received a message',event.data);
+  };
+  socket.onclose   = function(event) { 
+    logDebug('Client notified socket has closed',event); 
+  };
+  logDebug("Obj805 launched");
+  return ;
+}
+
+// read debug flag
+function isDebug() {
+  var rt = getCookie("debug_flag");
+  if (rt == "true")
+    return true;
+  else
+    return false;
+}
+
+// setting debug flag
+function setDebug(value) {
+  setCookie("debug_flag",value,null);
+  return ;
+}
+
+// set cookie
+function setCookie(c_name,value,expiredays) {
+  var exdate = new Date();
+  exdate.setDate(exdate.getDate()+expiredays);
+  document.cookie=c_name+ "=" +escape(value)+((expiredays==null) ? "" : ";expires="+exdate.toGMTString());
+}
+
+// get cookie
+function getCookie(c_name) {
+if (document.cookie.length>0) {
+  c_start=document.cookie.indexOf(c_name + "=");
+  if (c_start!=-1) { 
+    c_start=c_start + c_name.length+1;
+    c_end=document.cookie.indexOf(";",c_start);
+    if (c_end==-1) c_end=document.cookie.length;
+    return unescape(document.cookie.substring(c_start,c_end));
+    } 
+  }
+  return null;
+}
+
+// fetch GET params
+function fetchGETParams() {
    var url = location.search;
-   var theRequest = new Object();
+   var paramPairs = new Object();
    if (url.indexOf("?") != -1) {
       var str = url.substr(1);
       strs = str.split("&");
-      for(var i = 0; i < strs.length; i ++) {
-         theRequest[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
-      }
+      for(var i = 0; i < strs.length; i ++)
+        paramPairs[strs[i].split("=")[0]]=unescape(strs[i].split("=")[1]);
    }
-   return theRequest;
+   return paramPairs;
 }
 
-request = GetRequest();
-apiurl = request['url'];
-if (apiurl == null) apiurl = 'localhost:3000/speed';
-if (apiurl.length == 0) apiurl = 'localhost:3000/speed';
-
-var socket = new WebSocket('ws://'+apiurl);
-socket.onopen = function(event){
-  console.log('asdf');
-  socket.onmessage = function(event){
-    document.getElementById('speed').innerHTML = event.data;
-    dc = eval(event.data)
-    console.log('Client received a message',event.data);
-  };
-  socket.onclose = function(event) { 
-    console.log('Client notified socket has closed',event); 
-  }; 
-}
 
 
 // the onClick event
-function onClick_update(delta)
-{
-  var oldValue = parseInt(document.getElementById('speed').textContent);
-  var newValue = delta + oldValue;
-  if (newValue <= 100 && newValue >= 0) {
+function uploadNewValueToSvr(value) {
+  if (value <= 100 && value >= 0) {
     req = new XMLHttpRequest();
     req.open('POST','http://'+apiurl,true);
     req.onreadystatechange = function() {
       if (req.readyState == 4) {
-        if(req.status == 200) {
-          console.log('update data');
-          return;
-        }
-        else {
-          alert('error' + req.responseText);
-        }
+        if(req.status == 200) console.log('update data:' + value);
+        else alert('error' + req.responseText);
       }
     }
     req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    req.send("speed="+newValue);
+    req.send("speed="+value);
   }
 }
+
+// update new value to DOM
+function getNewValueFromSvr(value) {
+  dc = value;
+  document.getElementById('speedT').textContent = value;
+  document.getElementById('dc').value = value;
+  return ;
+}
+
+entryPoint();
