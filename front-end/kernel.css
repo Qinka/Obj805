@@ -8,3 +8,14 @@
 .frame h2 {
   font-size: 40pt;
 }
+
+.frame h3 {
+  font-size: 30pt;
+}
+
+.frame,
+.buttons,
+input.buttons,
+.buttons button {
+  font-size: 25pt;
+}

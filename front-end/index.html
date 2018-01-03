@@ -31,7 +31,7 @@
                     New remote: <br/>
                     <input type="url" value="" name="url"/>
                     <br/>
-                    <input type="submit" value="Reconnect"/>
+                    <input class="buttons" type="submit" value="Reconnect"/>
                 </form>
             </div>
             <div class=buttons>
@@ -40,12 +40,12 @@
         </div>
         <div id="fineTuning" class="frame">
             <h2>Fine Tuning</h2>
-            <div class=button>
+            <div class="buttons">
                 Current value: <span id="oldvalue"> </span> <br/>
                 New value: <input type="number" id="newvalue" min="0" max="100"  step="0.1"/> <br/>
                 <button onclick="updateNewValue()">Update</button>
             </div>
-            <div class=buttons>
+            <div class="buttons">
                 <button onclick="backToMainFrame()">Back</button>
             </div>
         </div>
