@@ -1,0 +1,10 @@
+.frame {
+  position: fixed;
+  width:  80%;
+  height: 80%;
+  left: 10%;
+  top: 10%;
+}
+.frame h2 {
+  font-size: 40pt;
+}

@@ -8,7 +8,7 @@
         <link href="kernel.js" ref="javascript"/>
     </head>
     <body>
-        <div class="mainFrame">
+        <div id="mainFrame" class="frame">
             <div class="ShowSpeed">
                 <h2> Speed of Fan</h2>
                 <span id="speedT">0</span>
@@ -23,13 +23,13 @@
                 <button onclick="fineTuning()">Fine Tuning</button>
             </div>
         </div>
-        <div class="Setting">
+        <div id="Setting" class="frame">
             <h2>Setting</h2>
             <div class=remote>
                 <h3>Remote Setting</h3>
                 <form>
                     New remote: <br/>
-                    <input type="text" value="" name="url"/>
+                    <input type="url" value="" name="url"/>
                     <br/>
                     <input type="submit" value="Reconnect"/>
                 </form>
@@ -38,7 +38,7 @@
                 <button onclick="backToMainFrame()">Back</button>
             </div>
         </div>
-        <div class="fineTuning">
+        <div id="fineTuning" class="frame">
             <h2>Fine Tuning</h2>
             <div class=button>
                 Current value: <span id="oldvalue"> </span> <br/>
