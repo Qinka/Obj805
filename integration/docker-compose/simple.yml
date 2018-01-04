@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  fe:
+    image: qinka/obj805:fe-v-bis-m-dev3-Linux-Ubuntu-trusty-GHC_8.2.2-x86_64-llvm-3.9-threaded-latest
+    container_name: "obj805-fe"
+    ports:
+      - 8000:80
+    volumes:
+      - /path/to/default.conf:/etc/nginx/conf.d/default.conf
+      - /path/to/htpasswd:/etc/nginx/htpasswd
+    links:
+      - be
+  be:
+    image: qinka/obj805:be-v-bis-m-dev3-Linux-Ubuntu-trusty-GHC_8.2.2-x86_64-llvm-3.9-threaded-latest
+    container_name: "obj805-be"
+    ports:
+      - "3000"
+    command: 
+      - -c 
+      - obj805-server 3000
