@@ -22,6 +22,8 @@ HTTP_PREFIX = os.environ.get('HTTP_PREFEX','http')
 WS_PREFIX = os.environ.get('WS_PREFIX','ws')
 # DEBUG FLAG
 DEBUG = os.environ.get('DEBUG','false')
+# Auth
+AUTHB64 = os.environ.get('AUTHB64')
 
 def readSpeedFromWebSocket(q):
     print('speed web socket start')
@@ -41,8 +43,8 @@ def readSpeedFromWebSocket(q):
   #  websocket.enableTrace(True)
     url = WS_PREFIX + '://' + API_URL
     print(url)
-    websocket.enableTrace(DEBUG == 'false')
-    webSock = websocket.WebSocketApp(url,
+    websocket.enableTrace(DEBUG != 'false' and DEBUG != '' )
+    webSock = websocket.WebSocketApp(url, header = ['Authorization: Basic '+AUTHB64],
                                      on_message = on_message,
                                      on_error = on_error,
                                      on_close = on_close)
@@ -89,9 +91,9 @@ def main():
     pSpeed     = Process(target=writeSpeed ,args=(q,))
     pSpeed.start()
     pWebSocket.start()
-    pStdin.start()
+    #pStdin.start()
     pSpeed.join()
-    pStdin.terminate()
+    #pStdin.terminate()
     pWebSocket.terminate()
 
 if __name__ == '__main__':
