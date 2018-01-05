@@ -36,6 +36,7 @@ def readSpeedFromWebSocket(q):
 
     def on_close(ws):
         print('web socket close')
+        readSpeedFromWebSocket(q)
 
     def on_open(ws):
         print('web socket open')
