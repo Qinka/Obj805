@@ -72,7 +72,9 @@ export IMAGE_LATEST=`echo $IMAGE_LATEST | sed 's/\//-/g'`
 cp -r $TRAVIS_BUILD_DIR/integration/dockerfiles/*.dockerfile     docker.tmp
 
 mkdir -p docker.tmp/static
+mkdir -p docker.tmp/conf.d
 cp -r $TRAVIS_BUILD_DIR/front-end/* docker.tmp/static
+mv docker.tmp/static/default.conf docker.tmp/conf.d
 
 echo build docker
 cd docker.tmp
