@@ -48,7 +48,13 @@ function backToMainFrame() {
     mainFrameVis(true);
     settingVis(false);
     fineTuningVis(false);
+    funnyVis(false);
     return ;
+}
+
+function runFunny() {
+    mainFrameVis(false);
+    funnyVis(true);
 }
 
 // debug output
@@ -68,6 +74,10 @@ function fineTuningVis(value) {
     return document.getElementById('fineTuning').style['visibility'] = value ? "" : "hidden";
 }
 
+function funnyVis(value) {
+    return document.getElementById('funny').style['visibility'] = value ? "" : "hidden";
+}
+
 // function for main
 function entryPoint() {
     debugFlag = isDebug();
@@ -83,10 +93,11 @@ function entryPoint() {
     else
         apiurl = document.domain + "/speed";
     setCookie("apiurl",apiurl,null);
-    connWS();
-    logDebug("Obj805 launched");
     fineTuningVis(false);
     settingVis(false);
+    funnyVis(false);
+    connWS();
+    logDebug("Obj805 launched");
     return ;
 }
 
@@ -183,4 +194,22 @@ function getNewValueFromSvr(value) {
     return ;
 }
 
+// function to load the script
+function loadScript(path) {
+    req = new XMLHttpRequest();
+    req.open('GET',document.location + path);
+    req.onreadystatechange = function () {
+        if (req.readyState == 4) {
+            if(req.status == 200) window.eval(req.responseText);
+        }
+    }
+    req.send(null);
+}
+
+function evalStr() {
+    var str = document.getElementById('evalStr').value;
+    window.eval(str);
+}
+
+// script(main)
 entryPoint();

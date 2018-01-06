@@ -5,7 +5,7 @@ from multiprocessing import Process, Queue
 import os
 import RPi.GPIO as GPIO
 import websocket
-
+import extension as e
 
 # Configurations
 # PWM Frequency
@@ -24,6 +24,9 @@ WS_PREFIX = os.environ.get('WS_PREFIX','ws')
 DEBUG = os.environ.get('DEBUG','false')
 # Auth
 AUTHB64 = os.environ.get('AUTHB64')
+# activation function name
+AF_NAME = os.environ.get('AF_NAME','ReLU')
+activationFunction = eval('e.'+AF_NAME)
 
 def readSpeedFromWebSocket(q):
     print('speed web socket start')
@@ -59,13 +62,6 @@ def readSpeedFromStdin(q):
         dc = input('Input new speed(0 ~ 100):')
         q.put(dc)
 
-def transformSpeed(speed):
-    if speed < 0:
-        return 0
-    elif speed > 100:
-        return 100
-    else:
-        return speed
 
 def writeSpeed(q):
     print('init GPIO')
@@ -81,7 +77,7 @@ def writeSpeed(q):
         print(value)
         if value < -1000:
             break
-        p.ChangeDutyCycle(transformSpeed(value))
+        p.ChangeDutyCycle(activationFunction(value))
     p.stop()
     GPIO.cleanup()
 

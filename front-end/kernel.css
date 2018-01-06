@@ -19,3 +19,7 @@ input.buttons,
 .buttons button {
   font-size: 25pt;
 }
+
+.funny {
+  visibility: hidden;
+}
