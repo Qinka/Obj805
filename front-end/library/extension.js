@@ -18,13 +18,14 @@ function sinDelay(value,delay) {
   timeoutRedo(function(v){uploadNewValueToSvr(50+50*Math.cos(v));},value,0.1,delay);
 }
 
-function sinNDelay(coe,value,delay) {
+function DTFT(sca,coe,value,coe_,bias,delay) {
   enable = true;
+  var len = Math.min(sca.length,coe.length);
   sinF = function (x) {
     var sum = 0;
-    for (i=0;i<coe.length-1;i++)
-      sum += Math.sin(coe[i]*x);
-    return sum/coe.length;
+    for (i=0;i<len;i++)
+      sum += sca[i] * Math.cos(coe[i] * x);
+    return sum;
   };
-  timeoutRedo(function(v){uploadNewValueToSvr(50+50*sinF(v));},value,0.1,delay);
+  timeoutRedo(function(v){uploadNewValueToSvr(100*(coe_ * sinF(v) + bias));},value,0.1,delay);
 }
