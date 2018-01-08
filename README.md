@@ -13,8 +13,8 @@ The first thing to do is to enter the "funny" mode.
 You need to launch the console of browser and then run `runFunny`.
 All the command run in funny's input text box can be executed in console.
 
-Secondly, you need to load the `library/extesion.js` script.
-You should run the `loadScript('library/extesion.js')` in input text box or console.
+Secondly, you need to load the `library/extension.js` script.
+You should run the `loadScript('library/extension.js')` in input text box or console.
 
 Thirdly, run the `DTFT()`. `DTFT` is defined with parameters:
 ```javascript
