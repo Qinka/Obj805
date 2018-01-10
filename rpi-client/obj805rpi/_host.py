@@ -5,7 +5,7 @@ from multiprocessing import Process, Queue
 import os
 import RPi.GPIO as GPIO
 import websocket
-import extension as e
+from ._extension import *
 import time
 
 # Configurations
@@ -18,7 +18,7 @@ PWM_PIN = int(os.environ.get('PWM_PIN', '35'))
 # API url
 API_URL = os.environ.get('API_URL','localhost:3000/speed')
 # HTTP
-HTTP_PREFIX = os.environ.get('HTTP_PREFEX','http')
+HTTP_PREFIX = os.environ.get('HTTP_PREFIX','http')
 # websocket
 WS_PREFIX = os.environ.get('WS_PREFIX','ws')
 # DEBUG FLAG
@@ -29,7 +29,7 @@ WS_RT_WAIT = os.environ.get('WS_RT_WAIT','120')
 AUTHB64 = os.environ.get('AUTHB64')
 # activation function name
 AF_NAME = os.environ.get('AF_NAME','ReLU')
-activationFunction = eval('e.'+AF_NAME)
+activationFunction = eval(AF_NAME)
 
 wsRetryCount = 0
 
@@ -89,6 +89,7 @@ def writeSpeed(q):
     GPIO.cleanup()
 
 def main():
+    print('start client')
     q = Queue()
     pWebSocket = Process(target=readSpeedFromWebSocket,args=(q,))
     pStdin     = Process(target=readSpeedFromStdin,args=(q,))

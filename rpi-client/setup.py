@@ -12,5 +12,4 @@ setup(
     author_email = 'me@qinka.pro',
 
     packages = find_packages(),
-    platforms = 'Linux',
 )
