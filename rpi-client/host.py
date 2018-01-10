@@ -6,6 +6,7 @@ import os
 import RPi.GPIO as GPIO
 import websocket
 import extension as e
+import time
 
 # Configurations
 # PWM Frequency
@@ -22,11 +23,15 @@ HTTP_PREFIX = os.environ.get('HTTP_PREFEX','http')
 WS_PREFIX = os.environ.get('WS_PREFIX','ws')
 # DEBUG FLAG
 DEBUG = os.environ.get('DEBUG','false')
+# WSRT TIME
+WS_RT_WAIT = os.environ.get('WS_RT_WAIT','120')
 # Auth
 AUTHB64 = os.environ.get('AUTHB64')
 # activation function name
 AF_NAME = os.environ.get('AF_NAME','ReLU')
 activationFunction = eval('e.'+AF_NAME)
+
+wsRetryCount = 0
 
 def readSpeedFromWebSocket(q):
     print('speed web socket start')
@@ -39,10 +44,12 @@ def readSpeedFromWebSocket(q):
 
     def on_close(ws):
         print('web socket close')
+        time.sleep(int(WS_RT_WAIT))
         readSpeedFromWebSocket(q)
 
     def on_open(ws):
         print('web socket open')
+        wsRetryCount += 1
 
   #  websocket.enableTrace(True)
     url = WS_PREFIX + '://' + API_URL
