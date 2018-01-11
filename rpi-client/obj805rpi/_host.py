@@ -49,7 +49,7 @@ def readSpeedFromWebSocket(q):
 
     def on_open(ws):
         print('web socket open')
-        wsRetryCount += 1
+        #wsRetryCount += 1
 
   #  websocket.enableTrace(True)
     url = WS_PREFIX + '://' + API_URL
