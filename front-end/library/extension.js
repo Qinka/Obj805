@@ -48,6 +48,7 @@ function mkSim(sca,coe,func) {
  */
 
 function timeoutNV(func,coe,bias,value,step,delay) {
+  enable = true;
   timeoutRedo(function(v){
     uploadNewValueToSvr(coe * func(v) + bias);},
   value,step,delay);
